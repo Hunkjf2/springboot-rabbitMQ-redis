@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: microsservico-log
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/logs_db?currentSchema=logs_db
+    username: postgres
+    password: postgresql
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+    default-schema: logs_db
+    schemas: logs_db
+  jpa:
+    properties:
+      hibernate:
+        default_schema: logs_db
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: log-service-group
+      auto-offset-reset: earliest
+
+server:
+  port: 8060
+
+logging:
+  level:
+    org.apache.kafka: INFO
+    org.hibernate.orm.connections.pooling: ERROR
+    org.hibernate.SQL: DEBUG

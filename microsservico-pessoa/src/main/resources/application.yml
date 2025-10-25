@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: pessoa
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      retries: 3
+    consumer:
+      group-id: pessoa-group
+      auto-offset-reset: earliest
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pessoa_db?currentSchema=pessoa_db
+    username: postgres
+    password: postgresql
+  jpa:
+    properties:
+      hibernate:
+        default_schema: pessoa_db
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+    schemas: pessoa_db
+
+server:
+  port: 8090
+  servlet:
+        context-path: /api
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      microsservico-serasa:
+        minimum-number-of-calls: 1  # 1 chamada já calcula
+        failure-rate-threshold: 100  # 100% de falha = 1 falha de 1 chamada
+        wait-duration-in-open-state: 3s # 3 segundos aberto
+        automatic-transition-from-open-to-half-open-enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.connections.pooling: ERROR
+    org.apache.kafka: INFO
+    org.springframework.kafka.requestreply.ReplyingKafkaTemplate: OFF
+
+
