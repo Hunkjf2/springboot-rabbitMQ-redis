@@ -67,6 +67,30 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
+
+		<!-- Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!-- Lettuce (cliente Redis recomendado) -->
+		<dependency>
+			<groupId>io.lettuce</groupId>
+			<artifactId>lettuce-core</artifactId>
+		</dependency>
+
+		<!-- Pool de conexões (opcional, mas recomendado) -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.7.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
