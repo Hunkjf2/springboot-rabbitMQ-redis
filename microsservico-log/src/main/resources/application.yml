@@ -16,17 +16,17 @@ spring:
       hibernate:
         default_schema: logs_db
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: log-service-group
-      auto-offset-reset: earliest
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
 server:
   port: 8060
 
 logging:
   level:
-    org.apache.kafka: INFO
+    org.springframework.amqp: INFO
     org.hibernate.orm.connections.pooling: ERROR
     org.hibernate.SQL: DEBUG

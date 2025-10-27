@@ -38,7 +38,7 @@ public class PessoaService {
         pessoa.setNegativado(negativado);
 
         Pessoa pessoaSalva = salvar(pessoa);
-        // logService.enviarDadosLog(pessoaSalva, CADASTRO);
+        logService.enviarDadosLog(pessoaSalva, CADASTRO);
         return pessoaSalva;
     }
 

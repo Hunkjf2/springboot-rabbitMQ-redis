@@ -1,13 +1,11 @@
 spring:
   application:
     name: pessoa
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      retries: 3
-    consumer:
-      group-id: pessoa-group
-      auto-offset-reset: earliest
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -41,7 +39,6 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.connections.pooling: ERROR
-    org.apache.kafka: INFO
-    org.springframework.kafka.requestreply.ReplyingKafkaTemplate: OFF
+    org.springframework.amqp: INFO
 
 

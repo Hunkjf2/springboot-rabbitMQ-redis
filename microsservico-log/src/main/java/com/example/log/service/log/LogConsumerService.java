@@ -4,45 +4,51 @@ import com.example.log.config.exception.ProcessingException;
 import com.example.log.dto.LogEventDto;
 import com.example.log.dto.PessoaDto;
 import com.example.log.model.Log;
-import com.example.log.service.kafka.KafkaSerializacaoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import static com.example.log.constants.TopicLog.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LogConsumerService {
-    
+
     private final LogService logService;
-    private final KafkaSerializacaoService kafkaSerializacaoService;
+    private final ObjectMapper objectMapper;
 
-    @KafkaListener(
-        topics = TOPIC_ENVIAR_LOG
-    )
-    public void processarEnvioLog(String mensagem, Acknowledgment acknowledgment) {
+    @RabbitListener(queues = TOPIC_ENVIAR_LOG)
+    public void processarEnvioLog(LogEventDto logEventDto, Channel channel, Message message) {
         try {
+            log.info("Recebendo mensagem de log para processamento: {}", logEventDto);
 
-            LogEventDto logEventDto = kafkaSerializacaoService.deserialize(mensagem, LogEventDto.class);
             PessoaDto pessoaDto = logEventDto.pessoaDto();
 
-            Log log = Log.builder()
+            String mensagemJson = objectMapper.writeValueAsString(logEventDto);
+
+            Log logObject = Log.builder()
                     .operacao(logEventDto.operacao())
-                    .dados(mensagem)
+                    .dados(mensagemJson)
                     .dataHoraCriacao(pessoaDto.dataHoraCriacao())
                     .nomeUsuario(logEventDto.nomeUsuario())
                     .nomeMicroSservico(logEventDto.microservico())
                     .idUsuario(pessoaDto.id())
                     .build();
 
-            logService.cadastrarLog(log);
+            logService.cadastrarLog(logObject);
 
-            acknowledgment.acknowledge(); // Confirma o processamento da mensagem
+            log.info("Log cadastrado com sucesso para usuário ID: {}", pessoaDto.id());
+
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // Confirma o processamento da mensagem
         } catch (Exception e) {
+            log.error("Erro ao processar mensagem de cadastro de log", e);
             throw new ProcessingException("Erro ao processar mensagem de cadastro de log: {}", e);
         }
 
     }
-    
+
 }

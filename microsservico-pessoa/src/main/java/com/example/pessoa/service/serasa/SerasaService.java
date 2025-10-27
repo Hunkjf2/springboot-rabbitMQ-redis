@@ -1,6 +1,6 @@
 package com.example.pessoa.service.serasa;
 
-import com.example.pessoa.service.kafka.KafkaSincronoService;
+import com.example.pessoa.service.rabbitmq.RabbitMQSincronoService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +12,11 @@ import static com.example.pessoa.constants.serasa.TopicSerasa.*;
 @Slf4j
 public class SerasaService {
 
-    private final KafkaSincronoService kafkaSincronoService;
+    private final RabbitMQSincronoService rabbitMQSincronoService;
 
     @CircuitBreaker(name = "microsservico-serasa", fallbackMethod = "fallbackConsultarSituacaoFinanceira")
     public Boolean consultarSituacaoFinanceira(String cpf) {
-        String resultado = kafkaSincronoService.enviarEReceber(
+        String resultado = rabbitMQSincronoService.enviarEReceber(
                  TOPIC_VERIFICAR_SERASA_REQUEST,
                  cpf);
         log.info("Situação financeira consultada para CPF {}: {}", cpf, resultado);

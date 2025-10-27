@@ -1,13 +1,11 @@
 spring:
   application:
     name: microsservico-serasa
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      retries: 3
-    consumer:
-      group-id: serasa-group
-      auto-offset-reset: earliest
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
 server:
   port: 8070
@@ -15,4 +13,4 @@ server:
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    org.apache.kafka: INFO
+    org.springframework.amqp: INFO
