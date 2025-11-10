@@ -52,6 +52,8 @@ app:
 
 server:
   port: 8060
+  servlet:
+    context-path: /api
 
 logging:
   level:

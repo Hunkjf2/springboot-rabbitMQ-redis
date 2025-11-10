@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Controller REST para operações de consulta de logs.
- * Todas as consultas utilizam Redis como fonte primária.
- */
 @RestController
 @RequestMapping("/logs")
 @RequiredArgsConstructor
@@ -25,20 +21,13 @@ public class LogController {
 
     private final LogService logService;
 
-    /**
-     * Endpoint: GET /logs
-     * Busca todos os logs (Redis primeiro, fallback PostgreSQL).
-     *
-     * @return Lista de logs
-     */
-    @GetMapping
-    @Operation(summary = "Listar todos os logs",
+    @GetMapping()
+    @Operation(summary = "Listar todos os logs consultando o Redis",
             description = "Retorna todos os logs do sistema. Dados vêm do cache Redis para performance otimizada.")
     public ResponseEntity<List<LogResponseDto>> listarTodos() {
         log.info("Requisição recebida: GET /logs");
 
         List<Log> logs = logService.buscarTodosLogs();
-
         List<LogResponseDto> response = logs.stream()
                 .map(LogResponseDto::from)
                 .collect(Collectors.toList());
@@ -47,37 +36,7 @@ public class LogController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Endpoint: GET /logs/operacao/{operacao}
-     * Busca logs por tipo de operação.
-     *
-     * @param operacao Operação (CADASTRO, ATUALIZAÇÃO, EXCLUSÃO)
-     * @return Lista filtrada de logs
-     */
-    @GetMapping("/operacao/{operacao}")
-    @Operation(summary = "Buscar logs por operação",
-            description = "Filtra logs por tipo de operação (CADASTRO, ATUALIZAÇÃO, EXCLUSÃO)")
-    public ResponseEntity<List<LogResponseDto>> buscarPorOperacao(
-            @PathVariable String operacao) {
 
-        log.info("Requisição recebida: GET /logs/operacao/{}", operacao);
-
-        List<Log> logs = logService.buscarLogsPorOperacao(operacao.toUpperCase());
-
-        List<LogResponseDto> response = logs.stream()
-                .map(LogResponseDto::from)
-                .collect(Collectors.toList());
-
-        log.info("Retornando {} logs para operação {}", response.size(), operacao);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * Endpoint: GET /logs/health
-     * Health check do serviço.
-     *
-     * @return Status do serviço
-     */
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Verifica se o serviço está operacional")
     public ResponseEntity<String> health() {

@@ -1,5 +1,6 @@
 package com.example.log.service.log;
 
+import com.example.log.dto.LogDto;
 import com.example.log.model.Log;
 import com.example.log.repository.LogRepository;
 import com.example.log.service.redis.LogRedisService;
@@ -21,34 +22,21 @@ public class LogService {
     private final LogRepository logRepository;
     private final LogRedisService logRedisService;
 
-    /**
-     * Cadastra log no PostgreSQL e Redis.
-     * Padrão Write-Through: Escreve em ambos simultaneamente.
-     *
-     * @param log Entidade a ser persistida
-     */
+
     @Transactional
     public void cadastrarLog(Log logPayload) {
         try {
-            // 1. Salva no banco de dados (source of truth)
             Log logSalvo = logRepository.save(logPayload);
             log.info("Log salvo no PostgreSQL: id={}", logSalvo.getId());
-
-            // 2. Salva no Redis (cache/consulta rápida)
             logRedisService.saveLog(logSalvo);
 
         } catch (Exception e) {
             log.error("Erro ao cadastrar log", e);
-            throw e; // Propaga para tratamento upstream
+            throw e;
         }
     }
 
-    /**
-     * Busca todos os logs.
-     * Estratégia Cache-Aside: Tenta Redis primeiro, fallback para PostgreSQL.
-     *
-     * @return Lista de logs
-     */
+
     public List<Log> buscarTodosLogs() {
         try {
             // 1. Tenta buscar do Redis (rápido)
@@ -73,35 +61,9 @@ public class LogService {
 
         } catch (Exception e) {
             log.error("Erro ao buscar logs", e);
-            // Em caso de erro total, retorna lista vazia para não quebrar API
             return List.of();
         }
     }
 
-    /**
-     * Busca logs por operação.
-     *
-     * @param operacao Tipo de operação (CADASTRO, ATUALIZAÇÃO, EXCLUSÃO)
-     * @return Lista filtrada de logs
-     */
-    public List<Log> buscarLogsPorOperacao(String operacao) {
-        try {
-            // Tenta do Redis
-            List<Log> logsFromCache = logRedisService.getLogsByOperacao(operacao);
-
-            if (!logsFromCache.isEmpty()) {
-                return logsFromCache;
-            }
-
-            // Fallback para PostgreSQL
-            return logRepository.findAll().stream()
-                    .filter(log -> operacao.equals(log.getOperacao()))
-                    .toList();
-
-        } catch (Exception e) {
-            log.error("Erro ao buscar logs por operação: {}", operacao, e);
-            return List.of();
-        }
-    }
 
 }

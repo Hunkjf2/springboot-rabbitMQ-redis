@@ -53,20 +53,6 @@ public class RedisService {
     }
 
     /**
-     * Deleta uma chave.
-     *
-     * @param key Chave a ser deletada
-     */
-    public void delete(String key) {
-        try {
-            redisTemplate.delete(key);
-            log.debug("Deletado do Redis: key={}", key);
-        } catch (Exception e) {
-            log.error("Erro ao deletar do Redis: key={}", key, e);
-        }
-    }
-
-    /**
      * Adiciona item a uma lista Redis (LPUSH).
      *
      * @param key Chave da lista
@@ -109,48 +95,6 @@ public class RedisService {
             redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("Erro ao definir TTL no Redis: key={}", key, e);
-        }
-    }
-
-    /**
-     * Verifica se uma chave existe.
-     *
-     * @param key Chave
-     * @return true se existe
-     */
-    public boolean exists(String key) {
-        try {
-            return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-        } catch (Exception e) {
-            log.error("Erro ao verificar existência no Redis: key={}", key, e);
-            return false;
-        }
-    }
-
-    /**
-     * Busca chaves por padrão.
-     *
-     * @param pattern Padrão (ex: "log:*")
-     * @return Set de chaves encontradas
-     */
-    public Set<String> keys(String pattern) {
-        try {
-            return redisTemplate.keys(pattern);
-        } catch (Exception e) {
-            log.error("Erro ao buscar chaves no Redis: pattern={}", pattern, e);
-            return Set.of();
-        }
-    }
-
-    /**
-     * Limpa todas as chaves (usar com cautela!).
-     */
-    public void flushAll() {
-        try {
-            redisTemplate.getConnectionFactory().getConnection().flushAll();
-            log.warn("Redis limpo completamente!");
-        } catch (Exception e) {
-            log.error("Erro ao limpar Redis", e);
         }
     }
 

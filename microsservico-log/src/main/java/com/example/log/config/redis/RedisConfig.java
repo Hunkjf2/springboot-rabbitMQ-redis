@@ -8,24 +8,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-/**
- * Configuração central do Redis para o microsserviço.
- * Define serialização, templates e estratégias de cache.
- */
 @Configuration
 public class RedisConfig {
 
-    /**
-     * RedisTemplate customizado para operações no Redis.
-     *
-     * Estratégia de Serialização:
-     * - Chaves: String (legibilidade e compatibilidade)
-     * - Valores: JSON (flexibilidade e suporte a objetos complexos)
-     *
-     * @param connectionFactory Fábrica de conexões gerenciada pelo Spring
-     * @param objectMapper ObjectMapper configurado (reutiliza config existente)
-     * @return RedisTemplate configurado
-     */
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate(
             RedisConnectionFactory connectionFactory,
